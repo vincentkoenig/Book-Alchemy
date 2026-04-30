@@ -16,5 +16,6 @@ class Book(db.Model):
     isbn = db.Column(db.Integer)
     title = db.Column(db.String)
     publication_year = db.Column(db.Integer)
+    author = db.relationship('Author', backref='books')
 
 

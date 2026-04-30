@@ -20,6 +20,9 @@
       <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{ book.title }}">
       <h3>{{ book.title }}</h3>
       <p>{{ book.author.name }}</p>
+      <form action="/book/{{ book.id }}/delete" method="POST">
+          <button type="submit">Delete Book</button>
+      </form>
   </div>
   {% endfor %}
 

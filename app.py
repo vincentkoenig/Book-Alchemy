@@ -47,13 +47,18 @@ def add_book():
 @app.route('/')
 def home():
     sort_by = request.args.get('sort_by', 'title')
+    search = request.args.get('search', '')
 
-    if sort_by == 'author':
+    if search:
+        books = Book.query.filter(Book.title.like(f'%{search}%')).all()
+    elif sort_by == 'author':
         books = Book.query.join(Author).order_by(Author.name).all()
     else:
         books = Book.query.order_by(Book.title).all()
 
-    return render_template('home.html', books=books, sort_by=sort_by)
+    message = "No books found matching your search." if search and not books else None
+
+    return render_template('home.html', books=books, sort_by=sort_by, message=message)
 
 
 if __name__ == '__main__':

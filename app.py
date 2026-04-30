@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from data_models import db, Author, Book
 import os
@@ -48,6 +48,7 @@ def add_book():
 def home():
     sort_by = request.args.get('sort_by', 'title')
     search = request.args.get('search', '')
+    message = request.args.get('message', '')
 
     if search:
         books = Book.query.filter(Book.title.like(f'%{search}%')).all()
@@ -56,10 +57,26 @@ def home():
     else:
         books = Book.query.order_by(Book.title).all()
 
-    message = "No books found matching your search." if search and not books else None
+    if search and not books:
+        message = "No books found matching your search."
 
     return render_template('home.html', books=books, sort_by=sort_by, message=message)
 
+
+@app.route('/book/<int:book_id>/delete', methods=['POST'])
+def delete_book(book_id):
+    book = Book.query.get(book_id)
+    author = book.author
+
+    db.session.delete(book)
+    db.session.commit()
+
+    # Delete author if no more books
+    if len(author.books) == 0:
+        db.session.delete(author)
+        db.session.commit()
+
+    return redirect(url_for('home', message="Book successfully deleted!"))
 
 if __name__ == '__main__':
     app.run(debug=True)

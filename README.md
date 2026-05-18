@@ -9,6 +9,7 @@ A web-based library management app built with **Flask** and **SQLAlchemy**. Add 
 - 🔍 **Search books** by title with live filtering
 - 🔃 **Sort** your library by title or author name
 - 🗑️ **Delete books** — authors are automatically removed when their last book is deleted
+- ✅ **Success messages** — confirmation feedback shown after adding or deleting entries
 - 💾 **SQLite database** — persistent local storage via SQLAlchemy ORM
 
 ## Tech Stack
@@ -22,13 +23,14 @@ A web-based library management app built with **Flask** and **SQLAlchemy**. Add 
 ## Data Model
 
 ```
-Author                    Book
-──────────────────        ──────────────────────
-id (PK)                   id (PK)
-name                      title
-birth_date                isbn
-date_of_death             publication_year
-                          author_id (FK → Author)
+Author                          Book
+────────────────────            ──────────────────────
+id (PK, autoincrement)          id (PK, autoincrement)
+name                            title
+birth_date                      isbn
+date_of_death (optional)        publication_year
+                                author_id (FK → authors.id)
+                                author (relationship → Author)
 ```
 
 A one-to-many relationship: one author can have many books. Deleting the last book of an author automatically removes the author from the database.
@@ -62,17 +64,19 @@ pip install flask flask-sqlalchemy
 
 **3. Initialize the database**
 
-Uncomment the following lines at the bottom of `app.py` once, then run:
+Uncomment the following lines at the bottom of `app.py` once, then run the app to create the database:
 ```python
 with app.app_context():
     db.create_all()
 ```
+After the database is created, re-comment those lines and restart the app normally.
+
+**4. Run the app**
 ```bash
 python app.py
 ```
-This creates `data/library.sqlite` automatically. Re-comment the lines afterwards.
 
-**4. Open in your browser**
+**5. Open in your browser**
 ```
 http://localhost:5000
 ```
@@ -83,4 +87,6 @@ http://localhost:5000
 - Implementing one-to-many relationships with foreign keys and `db.relationship`
 - Using Flask-SQLAlchemy for database queries, filtering, and sorting
 - Handling cascading deletes based on related data (auto-remove empty authors)
+- Parsing date inputs from HTML forms with `datetime.strptime`
 - Separating data models from application logic across multiple files
+- Passing success and error messages between routes using URL parameters

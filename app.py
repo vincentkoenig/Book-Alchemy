@@ -12,46 +12,49 @@ db.init_app(app)
 
 @app.route('/add_author', methods=['GET', 'POST'])
 def add_author():
-  if request.method == 'GET':
-    return render_template('add_author.html')
-  else:
-    name = request.form.get('name')
-    try:
-        birth_date = datetime.strptime(request.form.get('birth_date'), '%Y-%m-%d').date()
-        date_of_death = request.form.get('date_of_death')
-        date_of_death = datetime.strptime(date_of_death, '%Y-%m-%d').date() if date_of_death else None
-    except ValueError:
-        return render_template('add_author.html', error="Invalid date format!")
+    if request.method == 'GET':
+        success = request.args.get('success')
+        return render_template('add_author.html', success=success)
+    else:
+        name = request.form.get('name')
+        try:
+            birth_date = datetime.strptime(request.form.get('birth_date'), '%Y-%m-%d').date()
+            date_of_death = request.form.get('date_of_death')
+            date_of_death = datetime.strptime(date_of_death, '%Y-%m-%d').date() if date_of_death else None
+        except ValueError:
+            return render_template('add_author.html', error="Invalid date format!")
 
 
-    new_author = Author(name=name, birth_date=birth_date, date_of_death=date_of_death)
-    db.session.add(new_author)
-    db.session.commit()
+        new_author = Author(name=name, birth_date=birth_date, date_of_death=date_of_death)
+        db.session.add(new_author)
+        db.session.commit()
 
-    return render_template('add_author.html', success="Author successfully added!")
+        return redirect(url_for('add_author', success="Author successfully added!"))
 
 @app.route('/add_book', methods=['GET', 'POST'])
 def add_book():
-  if request.method == 'GET':
-    authors = Author.query.all()
-    return render_template('add_book.html', authors=authors)
-  else:
-    author_id = request.form.get('author_id')
-    isbn = request.form.get('isbn')
-    title = request.form.get('title')
-    if not title or not isbn or not author_id:
-        return render_template('add_book.html', authors=Author.query.all(), error="Book could not be added!")
-    try:
-        publication_year = int(request.form.get('publication_year'))
-    except ValueError:
-        return render_template('add_book.html', authors=Author.query.all(), error="Not a valid year!")
+    if request.method == 'GET':
+        success = request.args.get('success')
+        authors = Author.query.all()
+        return render_template('add_book.html', authors=authors, success=success)
+    else:
+        author_id = request.form.get('author_id')
+        isbn = request.form.get('isbn')
+        title = request.form.get('title')
+        if not title or not isbn or not author_id:
+            return render_template('add_book.html', authors=Author.query.all(), error="Book could not be added!")
+        try:
+            publication_year = int(request.form.get('publication_year'))
+        except ValueError:
+            return render_template('add_book.html', authors=Author.query.all(), error="Not a valid year!")
 
 
-    new_book = Book(author_id=author_id, isbn=isbn, title=title, publication_year=publication_year)
-    db.session.add(new_book)
-    db.session.commit()
+        new_book = Book(author_id=author_id, isbn=isbn, title=title, publication_year=publication_year)
+        db.session.add(new_book)
+        db.session.commit()
 
-    return render_template('add_book.html', authors=Author.query.all(), success="Book successfully added!")
+        return redirect(url_for('add_book', success="Book successfully added!"))
+
 
 
 @app.route('/')

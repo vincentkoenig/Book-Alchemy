@@ -75,7 +75,7 @@ def home():
 
 @app.route('/book/<int:book_id>/delete', methods=['POST'])
 def delete_book(book_id):
-    book = Book.query.get(book_id)
+    book = Book.query.get_or_404(book_id)
     author = book.author
 
     db.session.delete(book)

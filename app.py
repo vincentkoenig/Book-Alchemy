@@ -16,9 +16,13 @@ def add_author():
     return render_template('add_author.html')
   else:
     name = request.form.get('name')
-    birth_date = datetime.strptime(request.form.get('birth_date'), '%Y-%m-%d').date()
-    date_of_death = request.form.get('date_of_death')
-    date_of_death = datetime.strptime(date_of_death, '%Y-%m-%d').date() if date_of_death else None
+    try:
+        birth_date = datetime.strptime(request.form.get('birth_date'), '%Y-%m-%d').date()
+        date_of_death = request.form.get('date_of_death')
+        date_of_death = datetime.strptime(date_of_death, '%Y-%m-%d').date() if date_of_death else None
+    except ValueError:
+        return render_template('add_author.html', error="Invalid date format!")
+
 
     new_author = Author(name=name, birth_date=birth_date, date_of_death=date_of_death)
     db.session.add(new_author)

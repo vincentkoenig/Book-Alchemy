@@ -39,7 +39,13 @@ def add_book():
     author_id = request.form.get('author_id')
     isbn = request.form.get('isbn')
     title = request.form.get('title')
-    publication_year = request.form.get('publication_year')
+    if not title or not isbn or not author_id:
+        return render_template('add_book.html', authors=Author.query.all(), error="Book could not be added!")
+    try:
+        publication_year = int(request.form.get('publication_year'))
+    except ValueError:
+        return render_template('add_book.html', authors=Author.query.all(), error="Not a valid year!")
+
 
     new_book = Book(author_id=author_id, isbn=isbn, title=title, publication_year=publication_year)
     db.session.add(new_book)
